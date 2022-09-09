@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from spotify import spotify
+from api.spotify import spotify
 
 
 router = APIRouter()
