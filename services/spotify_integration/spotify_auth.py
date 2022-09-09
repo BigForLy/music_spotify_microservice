@@ -1,6 +1,6 @@
 import base64
-import httpx
 import aioredis
+import aiohttp
 from core.config import Settings, get_settings
 from fastapi import Depends
 
@@ -31,14 +31,18 @@ class SpotifyAuth:
             "Authorization": "Basic %s" % auth_header.decode("ascii"),
         }
         payload = {"grant_type": "client_credentials"}
-        async with httpx.AsyncClient() as client:
-            response: httpx.Response = await client.post(
-                url=SPOTIFY_TOKEN_URL,
-                data=payload,
-                headers=headers,
-            )
-            response.raise_for_status()  # TODO: raise exception
-        return response.json()
+        # async with httpx.AsyncClient() as client:
+        #     response: httpx.Response = await client.post(
+        #         url=SPOTIFY_TOKEN_URL,
+        #         data=payload,
+        #         headers=headers,
+        #     )
+        #     response.raise_for_status()  # TODO: raise exception
+        # return response.json()
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url=SPOTIFY_TOKEN_URL, data=payload, headers=headers) as response:
+                response.raise_for_status()  # TODO: raise exception
+                return await response.json()
 
     async def __get_token(self) -> str:
         spotify_token: bytes | None = await self.__redis.get(SPOTIFY_TOKEN)
