@@ -16,7 +16,7 @@ class SpotifyAuth:
     def __init__(self, settings: Settings = Depends(get_settings)) -> None:
         self.__client_id = settings.SPOTYFI_CLIENT_ID
         self.__secret_key = settings.SPOTYFI_SECRET_KEY
-        self.__redis = aioredis.from_url(settings.redis_url)  # use pool pattern
+        self.__redis = aioredis.from_url(f"redis://{settings.redis_url}")
 
     @property
     async def token(self):
