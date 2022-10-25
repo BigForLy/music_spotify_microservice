@@ -20,7 +20,10 @@ class SpotifyAuth:
 
     @property
     async def token(self):
-        return await self.__get_token()
+        spotify_token: bytes | None = await self.__redis.get(SPOTIFY_TOKEN)
+        if not spotify_token:
+            spotify_token = await self.__update_token()
+        return spotify_token
 
     async def __create_token(self) -> dict:
         auth_header = base64.urlsafe_b64encode(
@@ -31,23 +34,15 @@ class SpotifyAuth:
             "Authorization": "Basic %s" % auth_header.decode("ascii"),
         }
         payload = {"grant_type": "client_credentials"}
-        # async with httpx.AsyncClient() as client:
-        #     response: httpx.Response = await client.post(
-        #         url=SPOTIFY_TOKEN_URL,
-        #         data=payload,
-        #         headers=headers,
-        #     )
-        #     response.raise_for_status()  # TODO: raise exception
-        # return response.json()
+
         async with aiohttp.ClientSession() as session:
-            async with session.post(url=SPOTIFY_TOKEN_URL, data=payload, headers=headers) as response:
+            async with session.post(
+                url=SPOTIFY_TOKEN_URL, data=payload, headers=headers
+            ) as response:
                 response.raise_for_status()  # TODO: raise exception
                 return await response.json()
 
-    async def __get_token(self) -> str:
-        spotify_token: bytes | None = await self.__redis.get(SPOTIFY_TOKEN)
-        if spotify_token:
-            return spotify_token.decode("utf-8")
+    async def __update_token(self) -> str:
         token_data = await self.__create_token()
         await self.__redis.setex(
             SPOTIFY_TOKEN, token_data[EXPIRES_IN], token_data[ACCESS_TOKEN]
