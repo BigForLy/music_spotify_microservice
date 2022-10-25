@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends
 from .models import SpotifyAuthModel
-from services.spotify_integration.spotify_auth import SpotifyAuth
-from services.spotify_integration.spotify import MySpotify
+from services.spotify_integration import SpotifyAuth, MySpotify
 
 
 router = APIRouter()
