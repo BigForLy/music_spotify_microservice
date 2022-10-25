@@ -4,9 +4,12 @@ Part of the app `rest_spotify` for integration with Spotify.
 
 # Переменные окружения
 
-redis_url
-SPOTYFI_CLIENT_ID
-SPOTYFI_SECRET_KEY
+redis_url - Ссылка на Redis сервер
+
+SPOTYFI_CLIENT_ID - Идентификатор приложения пользователя Spotify
+
+SPOTYFI_SECRET_KEY - Секретный ключ приложения пользователя Spotify
+
 proxy_url
 
 # Запуск сервера
